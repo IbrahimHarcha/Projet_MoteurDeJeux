@@ -4,7 +4,7 @@
 #include "Transform.hpp" 
 
 using namespace std;
-
+const glm::vec3 g(0.0f, -6.0f, 0.0f);
 class Object
 {
 protected:
@@ -26,6 +26,7 @@ protected:
     glm::vec3 acceleration; // accélération
     glm::vec3 force; // force
     float mass; // masse
+    float k ; // rési air
 
 public:
     Transform transform;
@@ -57,19 +58,21 @@ public:
     // getters et setters
     glm::vec3 getVelocity() { return velocity; }
     void setVelocity(glm::vec3 velocity) { this->velocity = velocity; }
-
+    void updateVelocity(glm::vec3 velocity) { this->velocity += velocity; }
     glm::vec3 getAcceleration() { return acceleration; }
     void setAcceleration(glm::vec3 acceleration) { this->acceleration = acceleration; }
-
+    void updateAcceleration(glm::vec3 acceleration) { this->acceleration += acceleration; }
     glm::vec3 getForce() { return force; }
     void setForce(glm::vec3 force){ this->force = force; };
-
+    float getk() {return k ;}
+    void setk(float k){ this-> k = k ;}
     float getMass() { return mass; }
     void setMass(float mass) { this->mass = mass; }
 
     void updatePhysics(float deltaTime);
+    void updatePhysics2(float deltaTime);
     void applyForce(glm::vec3 force);
-
+    glm::vec3 cForce(glm::vec3 vitesse);
     glm::vec3 getSize();
 
 
@@ -88,9 +91,15 @@ Object::~Object()
     glDeleteBuffers(1, &vertexbuffer);
     glDeleteBuffers(1, &elementbuffer);
 }
+glm::vec3 Object::cForce( glm::vec3 vitesse) {
+    glm::vec3 forceGravite = mass * g;
+    glm::vec3 forceResistance = -k*vitesse;
+    glm::vec3 forceInit = getForce();
 
+    return forceGravite + forceResistance + forceInit;
+}
 void Object::updatePhysics(float deltaTime)
-{
+{   
     // la force de gravité (F = mg)
     glm::vec3 gravityForce = glm::vec3(0.0f, -9.81f * mass, 0.0f); // g = 9.81 m/s^2 (accélération gravitationnelle)
     
@@ -114,6 +123,25 @@ void Object::updatePhysics(float deltaTime)
     // on reset la force pour le prochain pas de simulation
     force = glm::vec3(0.0f);
 }
+void Object::updatePhysics2(float deltaTime)
+{   
+
+    glm::vec3 velocity = getVelocity();
+    glm::vec3 pos = transform.getPosition();
+    glm::vec3 force  = cForce(velocity);
+    float masse = getMass();
+    glm::vec3 acc = force/masse;
+    glm::vec3 midPos = pos + (0.5f * deltaTime)*velocity;
+    glm::vec3 midVel = velocity + (0.5f * deltaTime) * acc;
+    glm::vec3 midForc = cForce(midVel);
+    glm::vec3 midAcc = midForc/masse;
+    glm::vec3 newPos = pos + deltaTime*midVel;
+    glm::vec3 newVel = velocity+deltaTime*midAcc;
+    transform.setPosition(newPos);
+    setVelocity(newVel);
+    setForce(cForce(newVel));
+}
+
 
 void Object::setSpecialVelocity(const glm::vec3& specialVel)
 {

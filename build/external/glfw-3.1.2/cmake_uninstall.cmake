@@ -1,9 +1,9 @@
 
-if (NOT EXISTS "/home/aweyu/HAI819I_ProjetMoteur/TP5_code/build/external/glfw-3.1.2/install_manifest.txt")
-  message(FATAL_ERROR "Cannot find install manifest: \"/home/aweyu/HAI819I_ProjetMoteur/TP5_code/build/external/glfw-3.1.2/install_manifest.txt\"")
+if (NOT EXISTS "/home/e20190004357/M1/semestre2/Moteur/Projet_MoteurDeJeux-master/build/external/glfw-3.1.2/install_manifest.txt")
+  message(FATAL_ERROR "Cannot find install manifest: \"/home/e20190004357/M1/semestre2/Moteur/Projet_MoteurDeJeux-master/build/external/glfw-3.1.2/install_manifest.txt\"")
 endif()
 
-file(READ "/home/aweyu/HAI819I_ProjetMoteur/TP5_code/build/external/glfw-3.1.2/install_manifest.txt" files)
+file(READ "/home/e20190004357/M1/semestre2/Moteur/Projet_MoteurDeJeux-master/build/external/glfw-3.1.2/install_manifest.txt" files)
 string(REGEX REPLACE "\n" ";" files "${files}")
 
 foreach (file ${files})

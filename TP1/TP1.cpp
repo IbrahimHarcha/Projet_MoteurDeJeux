@@ -191,8 +191,10 @@ void resolveCollision(Object &voiture, Terrain &terrain, float dampingFactor) {
     velocity *= (1.0f - dampingFactor); 
     voiture.setVelocity(velocity);
 
+    voiture.transform.setPosition(voiturePosition + glm::vec3(0., 0.62, 0.));
+
     // on déplace le voiture dans la direction opposée pour simuler le rebond
-    voiture.transform.setPosition(voiturePosition +  collisionDirection * displacementFactor + glm::vec3(0.00018f, 0.62, 0.00018f));
+   // voiture.transform.setPosition(voiturePosition +  collisionDirection * displacementFactor + glm::vec3(0.00018f, 0.62, 0.00018f));
 }
 
 
@@ -251,9 +253,6 @@ void resolveCollision(Object &voiture, Terrain &terrain, float dampingFactor) {
 //         cube.transform.Translate(collisionDirection * displacementFactor);
 //     }
 // }
-
-
-
 
 int main(void)
 {
@@ -337,7 +336,7 @@ int main(void)
     glm::mat4 Projection = glm::mat4(1.f);
 
     // Chargement du fichier de maillage
-    std::string filename("chair.off");
+    //std::string filename("chair.off");
     // loadOFF(filename, indexed_vertices, indices, triangles );
 
     // Get a handle for our "LightPosition" uniform
@@ -348,8 +347,8 @@ int main(void)
     double lastTime = glfwGetTime();
     int nbFrames = 0;
 
-    // soleil.loadObject("./sphere.off");
-    // soleil.loadTexture("../textures/sun.jpg");
+     //soleil.loadObject("./sphere.off");
+     //soleil.loadTexture("../textures/sun.jpg");
 
     // cube.loadObject("./cube.off");
     // cube.loadTexture("../textures/snowrocks.png");
@@ -382,11 +381,11 @@ int main(void)
     // cube.setMass(1.0f);
     // cube.setForce(glm::vec3(0.0f, 0.0f, 0.0f));
 
-    voiture.setVelocity(glm::vec3(1.f));
-    voiture.setAcceleration(glm::vec3(0.0f, -9.81f, 0.0f));
+    voiture.setVelocity(glm::vec3(0));
+    voiture.setAcceleration(glm::vec3(0.0f, -0.0f, 0.0f));
     voiture.setMass(1.0f);
     voiture.setForce(glm::vec3(0.0f, 0.0f, 0.0f));
-
+    voiture.setk(0.3);
     bool isFirstFrame = true;
 
     do
@@ -432,7 +431,7 @@ int main(void)
         glUniformMatrix4fv(glGetUniformLocation(programID, "Projection"), 1, GL_FALSE, &Projection[0][0]);
 
         if(!isFirstFrame){
-            voiture.updatePhysics(deltaTime);
+            voiture.updatePhysics2(deltaTime);
         }
         // voiture.updatePhysics(deltaTime);
 
@@ -575,20 +574,22 @@ void processInput(GLFWwindow *window, Terrain &plan)
 
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
     {
-        voiture.transform.Translate(vec3(0.2, 0, 0));
+        // voiture.transform.Translate(vec3(0.2, 0, 0));
+       voiture.transform.Rotation(vec3(0.,1.,0.),2);
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
     {
-        voiture.transform.Translate(vec3(-0.2, 0, 0));
+        // voiture.transform.Translate(vec3(-0.2, 0, 0));
+        voiture.transform.Rotation(vec3(0.,1.,0.),-2);
     }
 
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
     {
-        voiture.transform.Translate(vec3(0., 0, -0.2));
+        voiture.applyForce(vec3(0, 0, -5));
     }
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
     {
-        voiture.transform.Translate(vec3(0, 0, 0.2));
+        voiture.applyForce(vec3(0, 0, 5));
     }
 
     // controls pour translater le cube sur l'axe y (haut et bas)
@@ -628,7 +629,6 @@ void processInput(GLFWwindow *window, Terrain &plan)
     {
         // vecteur de direction à 45 degrés vers le haut par rapport à la direction de vue
         voiture.transform.setPosition(glm::vec3(8, 0.61, 8));
-
         voiture.setVelocity(glm::vec3(1.f));
         voiture.setAcceleration(glm::vec3(0.0f, -9.81f, 0.0f));
         voiture.setMass(1.0f);

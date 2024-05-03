@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = -DGLEW_STATIC -DTW_NO_DIRECT3D -DTW_NO_LIB_PRAGMA -DTW_STATIC -D_CRT_SECURE_NO_WARNINGS
 
-CXX_INCLUDES = -I/home/aweyu/HAI819I_ProjetMoteur/TP5_code/external/glfw-3.1.2/include -I/home/aweyu/HAI819I_ProjetMoteur/TP5_code/external/glm-0.9.7.1 -I/home/aweyu/HAI819I_ProjetMoteur/TP5_code/external/glew-1.13.0/include -I/home/aweyu/HAI819I_ProjetMoteur/TP5_code/.
+CXX_INCLUDES = -I/home/e20190004357/M1/semestre2/Moteur/Projet_MoteurDeJeux-master/external/glfw-3.1.2/include -I/home/e20190004357/M1/semestre2/Moteur/Projet_MoteurDeJeux-master/external/glm-0.9.7.1 -I/home/e20190004357/M1/semestre2/Moteur/Projet_MoteurDeJeux-master/external/glew-1.13.0/include -I/home/e20190004357/M1/semestre2/Moteur/Projet_MoteurDeJeux-master/.
 
 CXX_FLAGS = 
 

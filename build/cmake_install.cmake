@@ -1,4 +1,4 @@
-# Install script for directory: /home/aweyu/HAI819I_ProjetMoteur/TP5_code
+# Install script for directory: /home/e20190004357/M1/semestre2/Moteur/Projet_MoteurDeJeux-master
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,7 +44,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/aweyu/HAI819I_ProjetMoteur/TP5_code/build/external/cmake_install.cmake")
+  include("/home/e20190004357/M1/semestre2/Moteur/Projet_MoteurDeJeux-master/build/external/cmake_install.cmake")
 
 endif()
 
@@ -56,5 +56,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/aweyu/HAI819I_ProjetMoteur/TP5_code/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/e20190004357/M1/semestre2/Moteur/Projet_MoteurDeJeux-master/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

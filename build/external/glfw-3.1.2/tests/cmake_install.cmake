@@ -1,4 +1,4 @@
-# Install script for directory: /home/aweyu/HAI819I_ProjetMoteur/TP5_code/external/glfw-3.1.2/tests
+# Install script for directory: /home/e20190004357/M1/semestre2/Moteur/Projet_MoteurDeJeux-master/external/glfw-3.1.2/tests
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
