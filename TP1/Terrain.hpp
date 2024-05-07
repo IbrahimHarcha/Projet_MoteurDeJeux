@@ -51,7 +51,7 @@ public:
     ~Terrain();
     void setPlan(int nX, int nY, int sizeX, int sizeY, float offsetX, float offsetZ, float offsetY, bool HeightMap, string path = "");
     void changeResolution(int newResX, int newResY);
-    void draw(GLuint programID);
+    void draw(GLuint programID, float camPosZ);
 
     // vector<vec3> getTerrainVertices()
     // {
@@ -167,15 +167,22 @@ void Terrain::changeResolution(int newResX, int newResY)
     setPlan(this->nX, this->nY, this->sizeX, this->sizeY, this->offsetX, this->offSetZ, this->offsetY, this->HeightMap, this->path);
 }
 
-void Terrain::draw(GLuint programID)
+void Terrain::draw(GLuint programID, float camPosZ)
 {
+    // float distanceThreshold = 32.0f; 
+    // if (std::abs(transform.getPosition().z - camPosZ) > distanceThreshold)
+    // {
+    //     std::cout<<"On ne dessine pas..."<<std::endl;
+    //     // l'objet est trop éloigné le long de l'axe Z, ne le dessinez pas
+    //     return;
+    // }
     if (this->hmap != -1)
     {
         glActiveTexture(GL_TEXTURE0 + 1);
         glUniform1i(glGetUniformLocation(programID, "heightMapPlan"), 1);
         glBindTexture(GL_TEXTURE_2D, this->hmap);
     }
-    Object::draw(programID);
+    Object::draw(programID, camPosZ);
 }
 
 

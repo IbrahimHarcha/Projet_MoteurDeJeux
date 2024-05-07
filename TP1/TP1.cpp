@@ -136,8 +136,8 @@ float terrainHeightAtCubePosition(Terrain& terrain, const vec3& cubePosition) {
     int gridZ = static_cast<int>((terrainZ / terrainDepth) * (terrainDepth - 1));
 
     // on s'assure que les indices de la grille sont dans les limites du terrain
-    gridX = clamp(gridX, 0, terrainWidth - 1);
-    gridZ = clamp(gridZ, 0, terrainDepth - 1);
+    gridX = glm::clamp(gridX, 0, terrainWidth - 1);
+    gridZ = glm::clamp(gridZ, 0, terrainDepth - 1);
 
     // on calcule les coordonnées interpolées pour trouver la hauteur du terrain
     float xCoord = fmod(terrainX, terrainWidth / (terrainWidth - 1)) / (terrainWidth / (terrainWidth - 1));
@@ -191,9 +191,13 @@ void resolveCollision(Object &voiture, Terrain &terrain, float dampingFactor) {
     velocity *= (1.0f - dampingFactor); 
     voiture.setVelocity(velocity);
 
+    voiture.transform.setPosition(voiturePosition + glm::vec3(0., 0.62, 0.));
+
     // on déplace le voiture dans la direction opposée pour simuler le rebond
-    voiture.transform.setPosition(voiturePosition +  collisionDirection * displacementFactor + glm::vec3(0.00018f, 0.62, 0.00018f));
+   // voiture.transform.setPosition(voiturePosition +  collisionDirection * displacementFactor + glm::vec3(0.00018f, 0.62, 0.00018f));
 }
+
+
 
 
 // Saut avec rebond
@@ -222,37 +226,54 @@ void resolveCollision(Object &voiture, Terrain &terrain, float dampingFactor) {
 //     cube.transform.setPosition(cubePosition +  collisionDirection * displacementFactor + glm::vec3(0.00018f, 0.5f, 0.00018f));
 // }
 
-// void resolveCollision(Object &cube, Terrain &terrain, float dampingFactor) {
-//     vec3 cubePosition = cube.transform.getPosition();
-//     vec3 terrainPosition = terrain.transform.getPosition();
-//     float terrainHeight = terrainHeightAtCubePosition(terrain, cubePosition); 
-//     float cubeHeight = cubePosition.y - terrainPosition.y;
-    
-//     // Vérifier si une collision est détectée
-//     if (cubeHeight < terrainHeight) {
-//         cubePosition.y = terrainPosition.y + terrainHeight; // Placez le cube sur le terrain
-//         cube.transform.setPosition(cubePosition);
+// float newPlan(Object &Parent, float offSetPrec)
+// {
+//     Object *plan2 = new Terrain(16, 16, 8, 16, 0, offSetPrec + 16, false, "../textures/road4.jpg", -0.001);
+//     plan2->loadTexture("../textures/road4.jpg");
 
-//         // on calcule la direction de la collision en comparant les positions de l'objet et du terrain
-//         vec3 collisionDirection = normalize(terrainPosition - cubePosition);
+//     Parent.add(*plan2);
+//     Parent.generatedPlans.push(plan2);
 
-//         vec3 velocity = cube.getVelocity();
-//         velocity.y = -velocity.y; 
-//         cube.setVelocity(velocity);
-
-//         // on calcule le facteur de déplacement en fonction de la magnitude de la vitesse et du temps écoulé
-//         float displacementFactor = length(velocity) * deltaTime;
-
-//         // on applique un facteur d'amortissement à la vitesse du cube pour réduire progressivement la magnitude de la vitesse
-//         velocity *= (1.0f - dampingFactor); 
-//         cube.setVelocity(velocity);
-
-//         // on déplace le cube dans la direction opposée pour simuler le rebond
-//         cube.transform.Translate(collisionDirection * displacementFactor);
+//     if (offSetPrec > 600)
+//     {
+//         Object* oldPlan = Parent.generatedPlans.front();
+//         Parent.generatedPlans.pop();
+//         Parent.remove(*oldPlan);
+//         delete oldPlan;
 //     }
+
+//     return offSetPrec + 16;
 // }
 
+int cmt = 0;
 
+
+float newPlan(Object &Parent, float offSetPrec, int &cmt)
+{
+    Object *plan2 = new Terrain(8, 8, 8, 16, 0, offSetPrec + 16, false, "../textures/road4.jpg", -0.001);
+    plan2->loadTexture("../textures/road4.jpg");
+
+    Parent.add(*plan2);
+    Parent.generatedPlans.push(plan2);
+
+    // plan2->transform.setPosition2(glm::vec3(0, -0.001, offSetPrec + 16));
+
+    if (camera_position.z < cmt)
+    {
+        Object* oldPlan = Parent.generatedPlans.front();
+        Parent.generatedPlans.pop();
+        Parent.remove(*oldPlan);
+        delete oldPlan;
+
+        std::cout << "Deleted plan" << std::endl;
+        std::cout<<camera_position.z<<std::endl;
+        std::cout<<cmt<<std::endl;
+
+        cmt-=32;
+    }
+
+    return offSetPrec + 16;
+}
 
 
 int main(void)
@@ -337,7 +358,7 @@ int main(void)
     glm::mat4 Projection = glm::mat4(1.f);
 
     // Chargement du fichier de maillage
-    std::string filename("chair.off");
+    //std::string filename("chair.off");
     // loadOFF(filename, indexed_vertices, indices, triangles );
 
     // Get a handle for our "LightPosition" uniform
@@ -348,18 +369,6 @@ int main(void)
     double lastTime = glfwGetTime();
     int nbFrames = 0;
 
-    // soleil.loadObject("./sphere.off");
-    // soleil.loadTexture("../textures/sun.jpg");
-
-    // cube.loadObject("./cube.off");
-    // cube.loadTexture("../textures/snowrocks.png");
-    // // cube.loadTexture("../textures/sun.jpg");
-    // // cube.transform.Scale(vec3(0.3, 0.3, 0.3));
-    // cube.transform.Translate(vec3(8., 0.5, 8.));
-
-    // soleil.transform.Scale(vec3(0.3, 0.3, 0.3));
-    // soleil.transform.Translate(vec3(2, 2, 0));
-
     voiture.loadObjectCustom("./Porsche_911_GT2.obj",0);
     voiture.loadTexture("../textures/or.jpg");
     voiture.transform.Translate(vec3(8, 0.62, 8));
@@ -368,25 +377,33 @@ int main(void)
     Terrain plan(64, 64, 16, 16, 0, 0, true, "../textures/grass.png",0);
     plan.loadTexture("../textures/grass.png");
 
+    Terrain road(16,16,8,16,0,0,false,"../textures/road4.jpg",-0.001);
+    road.loadTexture("../textures/road4.jpg");
 
-    // plan.add(cube);
-    plan.add(voiture);
+    Terrain road2(16, 16, 8, 16, 0, 16,false,"../textures/road4.jpg",-0.001);
+    road2.loadTexture("../textures/road4.jpg");
+    Terrain road3(16, 16, 8, 16, 0, 32,false,"../textures/road4.jpg",-0.001);
+    road3.loadTexture("../textures/road4.jpg");
+
+    road.add(voiture);
+    road.add(road2);
+    road.add(road3);
+    float currentOffSetZ = 0;
+    float ymax = 16;
+
+    // road.transform.setPosition2(glm::vec3(0, -0.001, 0));
+    // road2.transform.setPosition2(glm::vec3(0, -0.001, 16));
+    // road3.transform.setPosition2(glm::vec3(0, -0.001, 32));
 
     // centrer la caméra sur le plan
-    centrerCamera(plan.getVertices(), camera_position, camera_target);
-    centrerCamera(plan.getVertices(), cameraPosOrbit, cameraTargetOrbit); // have to try to fix this...
+    centrerCamera(road.getVertices(), camera_position, camera_target);
+    centrerCamera(road.getVertices(), cameraPosOrbit, cameraTargetOrbit); // have to try to fix this...
 
-
-    // cube.setVelocity(glm::vec3(1.f));
-    // cube.setAcceleration(glm::vec3(0.0f, -9.81f, 0.0f));
-    // cube.setMass(1.0f);
-    // cube.setForce(glm::vec3(0.0f, 0.0f, 0.0f));
-
-    voiture.setVelocity(glm::vec3(1.f));
-    voiture.setAcceleration(glm::vec3(0.0f, -9.81f, 0.0f));
+    voiture.setVelocity(glm::vec3(0));
+    voiture.setAcceleration(glm::vec3(0.0f, -0.0f, 0.0f));
     voiture.setMass(1.0f);
     voiture.setForce(glm::vec3(0.0f, 0.0f, 0.0f));
-
+    voiture.setk(0.3);
     bool isFirstFrame = true;
 
     do
@@ -432,7 +449,7 @@ int main(void)
         glUniformMatrix4fv(glGetUniformLocation(programID, "Projection"), 1, GL_FALSE, &Projection[0][0]);
 
         if(!isFirstFrame){
-            voiture.updatePhysics(deltaTime);
+            voiture.updatePhysics2(deltaTime);
         }
         // voiture.updatePhysics(deltaTime);
 
@@ -445,10 +462,21 @@ int main(void)
             // resolveCollision(voiture, plan);
         }
         // voiture.update();
-        voiture.draw2(programID);
+        voiture.draw2(programID, camera_position.z);
 
-        plan.update();
-        plan.draw(programID);
+        if (camera_position.z < ymax)
+        {
+
+            currentOffSetZ=newPlan(road,currentOffSetZ, cmt);
+            ymax--;
+            // road.removeFirstChild();
+        }
+
+        road.update();
+        road.draw(programID, camera_position.z);
+
+        // plan.update();
+        // plan.draw(programID);
 
         isFirstFrame = false;
 
@@ -534,7 +562,7 @@ void processInput(GLFWwindow *window, Terrain &plan)
         libre = true; orbital = false;
     }
 
-    float cameraSpeed = 2.5 * deltaTime;
+    float cameraSpeed = 5. * deltaTime;
 
     if(libre){
         //Camera zoom in and out
@@ -573,22 +601,38 @@ void processInput(GLFWwindow *window, Terrain &plan)
             cameraPosOrbit -= glm::normalize(glm::cross(cameraTargetOrbit - cameraPosOrbit, camera_up))*cameraSpeed;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-    {
-        voiture.transform.Translate(vec3(0.2, 0, 0));
-    }
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-    {
-        voiture.transform.Translate(vec3(-0.2, 0, 0));
-    }
+    // if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+    // {
+    //     // voiture.transform.Translate(vec3(0.2, 0, 0));
+    //     if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
+    //          voiture.transform.Rotation(vec3(0.,1.,0.),-0.009);
+    //     }
+    //     if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
+    //          voiture.transform.Rotation(vec3(0.,1.,0.),0.009);
+    //     }
+    //     // vec3 forward = vec3(voiture.transform.getLocalModel() * vec4(0, 0, -1, 0));
+    //     // voiture.transform.Translate(forward);
+    // }
+    // if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+    // {
+    //     // voiture.transform.Translate(vec3(-0.2, 0, 0));
+    //     if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
+    //          voiture.transform.Rotation(vec3(0.,1.,0.),0.009);
+    //     }
+    //     if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
+    //          voiture.transform.Rotation(vec3(0.,1.,0.),-0.009);
+    //     }
+    //     // vec3 forward = vec3(voiture.transform.getLocalModel() * vec4(0, 0, -1, 0));
+    //     // voiture.transform.Translate(forward);
+    // }
 
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
     {
-        voiture.transform.Translate(vec3(0., 0, -0.2));
+        voiture.applyForce(vec3(0, 0, -5));
     }
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
     {
-        voiture.transform.Translate(vec3(0, 0, 0.2));
+        voiture.applyForce(vec3(0, 0, 5));
     }
 
     // controls pour translater le cube sur l'axe y (haut et bas)
@@ -602,21 +646,21 @@ void processInput(GLFWwindow *window, Terrain &plan)
     }
 
 
-    // if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-    // {
-    //     cube.setVelocity(glm::vec3(1.f));
-    //     // Calculer le vecteur de direction à 45 degrés vers le haut par rapport à la direction de vue
-    //     glm::vec3 direction = glm::normalize(camera_target + camera_up);
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+    {
+        // faire glisser la voiture a gauche 
+        voiture.applyForce(glm::vec3(-5, 0, 0));
+    }
 
-    //     // Mettre à jour la position de l'objet en fonction de la vitesse et du temps écoulé
-    //     float deltaTimeCurr = deltaTime;
-    //     glm::vec3 newPosition = cube.transform.getPosition() + cube.getVelocity() * direction * deltaTimeCurr;
-    //     cube.transform.setPosition(newPosition);
-    // }
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+    {
+        // faire glisser la voiture a gauche 
+        voiture.applyForce(glm::vec3(5, 0, 0));
+    }
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
     {
-        // vecteur de direction à 45 degrés vers le haut par rapport à la direction de vue
+        // vecteur de direction à 45 degrés vers le haut par rapport à la direction de vued
         glm::vec3 direction = glm::normalize(camera_target + camera_up);
 
         voiture.setSpecialVelocity(direction * 2.0f); // Vitesse pour le saut
@@ -628,7 +672,6 @@ void processInput(GLFWwindow *window, Terrain &plan)
     {
         // vecteur de direction à 45 degrés vers le haut par rapport à la direction de vue
         voiture.transform.setPosition(glm::vec3(8, 0.61, 8));
-
         voiture.setVelocity(glm::vec3(1.f));
         voiture.setAcceleration(glm::vec3(0.0f, -9.81f, 0.0f));
         voiture.setMass(1.0f);
