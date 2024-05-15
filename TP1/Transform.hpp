@@ -8,11 +8,27 @@ class Transform
 {
 private:
     mat4 localMat = mat4(1.0f);
-
+    vec3 prevPosition = vec3(0.0f);
 public:
     // Global space information concatenate in matrix
     mat4 model = mat4(1.0f);
     vec3 t;
+
+    void setLocalMatX(float res)
+    {
+        localMat[0][2] = res;
+    }
+
+    void Translate2(vec3 translation)
+    {
+        // Calcul de la translation relative par rapport à la position précédente
+        vec3 relativeTranslation = translation - prevPosition;
+        
+        localMat = translate(localMat, relativeTranslation);
+        t += relativeTranslation;
+        prevPosition = t; // Mettre à jour la position précédente
+    }
+
 
     void Translate(vec3 translatation)
     {

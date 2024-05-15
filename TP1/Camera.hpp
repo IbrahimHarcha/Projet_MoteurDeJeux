@@ -7,7 +7,7 @@ using namespace glm;
 class Camera : public Object
 {
 private:
-    vec3 Depposition;
+    vec3 startPos;
     vec3 position;
     vec3 target;
     vec3 direction; // /!\pointe dans la direction inverse
@@ -20,7 +20,7 @@ public:
     ~Camera();
     Camera(vec3 position, vec3 target, vec3 up, vec3 front)
     {
-        this->Depposition = position;
+        this->startPos = position;
         this->position = position;
         this->target = target;
         this->direction = glm::normalize(this->position - this->target);
@@ -28,6 +28,11 @@ public:
         this->front = front;
         this->up = up;
         this->right = glm::normalize(glm::cross(this->up, this->direction));
+    }
+
+    void addPosition(vec3 pos)
+    {
+        this->position += pos;
     }
 
     bool getFirstPerson()
@@ -40,14 +45,14 @@ public:
         this->firstPerson = b;
     }
 
-    vec3 getDepPosition()
+    vec3 getStartPos()
     {
-        return Depposition;
+        return startPos;
     }
 
-     void setDepPosition(glm::vec3 pos)
+     void setStartPos(glm::vec3 pos)
     {
-        Depposition = pos;
+        startPos = pos;
     }
 
 
@@ -111,18 +116,24 @@ public:
         up = u;
     }
 
-
-
-    void updateMeAndChilds()
+    void updateTree()
     {
-        if (this->parent)
+        if(!this->firstPerson)
         {
-            vec4 new_pos = this->parent->transform.model * (vec4(this->Depposition, 1.0));
-            this->transform.model = this->parent->transform.model;
-            this->position.x = new_pos.x;
-            this->position.y = new_pos.y;
-            this->position.z = new_pos.z;
+            if (this->parent)
+                this->transform.model = this->parent->transform.model * this->transform.getLocalModel();
+                else
+                this->transform.model = this->transform.getLocalModel();
         }
+        else{
+            if (this->parent){
+                vec4 new_pos = this->parent->transform.model * (vec4(this->startPos, 1.0));
+                this->transform.model = this->parent->transform.model;
+                this->position.x = new_pos.x;
+                this->position.y = new_pos.y;
+                this->position.z = new_pos.z;
+            }
+        }   
 
         for (auto &&child : children)
         {

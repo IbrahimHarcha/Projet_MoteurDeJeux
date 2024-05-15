@@ -63,6 +63,7 @@ add_executable(TP1
 		TP1/Object.hpp
 		TP1/Terrain.hpp
 		TP1/Voiture.hpp
+		TP1/Cube.hpp
 	common/shader.cpp
 	common/shader.hpp
 	common/controls.cpp

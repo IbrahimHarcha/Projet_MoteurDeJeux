@@ -2,12 +2,12 @@
 
 // Ouput data
 out vec4 color;
-in vec2 o_uv0;
+in vec2 uv2;
 // flat in int numText;
 
 uniform sampler2D text;
 in vec4 boundsAndheight;
 
 void main(){
-        color =texture(text,o_uv0);
+        color = texture(text,uv2);
 }

@@ -36,7 +36,6 @@ protected:
 
 public:
     Transform transform;
-    int typeObject;
     Object();
     ~Object();
     void add(Object *child);
@@ -49,11 +48,6 @@ public:
     vector<Object *> getChilds();
     void removeChild(int pos);
     vector<vec3> boiteEnglobante();
-    vector<vec3> getBE();
-    void addBE(vector<vec3> BEenCours, vector<vec3> BE);
-    vec3 modifTranslation(vec3 translationEnCours, vec3 t);
-    vec3 modifTranslationBis(vec3 translationEnCours, vec3 scale);
-    void setBE(vector<vec3> BE);
 
     void loadObject(const std::string &filename, int typeObject);
 
@@ -79,6 +73,11 @@ public:
 
 
     void setSpecialVelocity(const glm::vec3& specialVel);
+
+    void setParent(Object *parent)
+    {
+        this->parent = parent;
+    }
 
 };
 
@@ -181,7 +180,10 @@ void Object::updatePhysics(float deltaTime)
     glm::vec3 midAcc = midForc/masse;
     glm::vec3 newPos = pos + deltaTime*midVel;
     glm::vec3 newVel = velocity+deltaTime*midAcc;
-    transform.setPosition(newPos);
+    //printf("position avant %f %f %f \n",transform.getPosition().x,transform.getPosition().y,transform.getPosition().z);
+    transform.Translate(newPos-pos);
+    transform.setPosition(transform.t);
+    //printf("position après %f %f %f \n",transform.getPosition().x,transform.getPosition().y,transform.getPosition().z);
     setVelocity(newVel);
     setForce(cForce(newVel));
 }
@@ -341,32 +343,4 @@ vector<vec3> Object::boiteEnglobante()
         cube.push_back(vec3(Xmin,Ymin,Zmin));
         cube.push_back(vec3(Xmax,Ymax,Zmax));
         return cube;
-}
-
-
-vector<vec3> Object::getBE()
-{
-    return cube;
-}
-
-void Object::addBE(vector<vec3> BEenCours, vector<vec3> BE)
-{
-    cube[0][0] = std::min(BEenCours[0][0], BE[0][0]);
-    cube[0][1] = std::min(BEenCours[0][1], BE[0][1]);
-    cube[0][2] = std::min(BEenCours[0][2], BE[0][2]);
-    cube[1][0] = std::max(BEenCours[1][0], BE[1][0]);
-    cube[1][1] = std::max(BEenCours[1][1], BE[1][1]);
-    cube[1][2] = std::max(BEenCours[1][2], BE[1][2]);
-}
-
-vec3 Object::modifTranslation(vec3 translationEnCours, vec3 t){
-    return vec3(translationEnCours[0] + t[0], translationEnCours[1] + t[1], translationEnCours[2] + t[2]) ;
-}
-
-vec3 Object::modifTranslationBis(vec3 translationEnCours, vec3 scale){
-    return vec3(translationEnCours[0] * scale[0], translationEnCours[1] * scale[1], translationEnCours[2] * scale[2]);
-}
-
-void Object::setBE(vector<vec3> BE){
-    cube = {{BE[0][0], BE[0][1], BE[0][2]},{BE[1][0], BE[1][1], BE[1][2]}};
 }
