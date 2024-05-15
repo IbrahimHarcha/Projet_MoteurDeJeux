@@ -54,7 +54,7 @@ float pitch = 0.0f;
 float lastX = 800.0f / 2.0;
 float lastY = 600.0 / 2.0;
 float fov = 45.0f;
-
+int sizeRoadX = 16;
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -217,7 +217,6 @@ int main(void)
 
     int resolutionX = 2;
     int resolutionY = 2;
-    int sizeRoadX = 16;
     int sizeY = 16;
 
     // Routes
@@ -394,8 +393,6 @@ int main(void)
                 voiture.updatePhysics(deltaTime);
                 if(collisionCarRoad(voiture, planInfini)){                    
                     resolveCollision(voiture, planInfini);
-                }else{
-                    play = false;
                 }
             }
 
@@ -634,8 +631,8 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 bool collisionCarRoad(Object &voiture, Terrain &terrain){
     glm::vec3 voiturePos = voiture.transform.getPosition();
 
-    bool collisionX = (voiturePos.x > -6) &&
-                      (voiturePos.x < 6);
+    bool collisionX = (voiturePos.x > -(sizeRoadX/2 -2)) &&
+                      (voiturePos.x < sizeRoadX/2 -2);
 
     return collisionX;
 }
@@ -683,8 +680,7 @@ void collisionCarCube(Voiture &car, Cube &cubeInfini) {
             (max.x > cubeMin.x && max.x < cubeMax.x && min.z > cubeMin.z && min.z < cubeMax.z) ||
             (min.x > cubeMin.x && min.x < cubeMax.x && max.z > cubeMin.z && max.z < cubeMax.z) ||
             (max.x > cubeMin.x && max.x < cubeMax.x && max.z > cubeMin.z && max.z < cubeMax.z)) {
-            // std::cout << "Collision detecté" << i + 1 << std::endl;
-            // React to the collision...
+   
             play = false;
             voiture.setStop(true);
         }
@@ -693,7 +689,7 @@ void collisionCarCube(Voiture &car, Cube &cubeInfini) {
 
 void resolveCollision(Voiture &voiture, Terrain &terrain){
     voiture.transform.Translate(vec3(voiture.transform.getPosition().x, 0.62, voiture.transform.getPosition().z) - voiture.transform.getPosition());
-    voiture.setVelocity(glm::vec3(voiture.getVelocity().x, -voiture.getVelocity().y,voiture.getVelocity().z));
+    //voiture.setVelocity(glm::vec3(voiture.getVelocity().x, -voiture.getVelocity().y,voiture.getVelocity().z));
 }
 
 void desseleration(Voiture &voiture)
@@ -713,7 +709,7 @@ void cubeInf(Cube &cubeInfini)
         Cube *currentCube = dynamic_cast<Cube *>(cubeInfini.getChilds()[i - 1]);
         if (cubeInfini.transform.t.z > (float)(currentCube->getsizeY() / 2) + (i - 1) * currentCube->getsizeY() + 2 && cubeToMove== i)
         {
-            float randomX = (static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * (4 - (-4)) - 4;
+            float randomX = (static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * (sizeRoadX - 2) - (sizeRoadX / 2);
             if(currentCube->transform.getPosition().x+randomX<-6 || currentCube->transform.getPosition().x+randomX>6){
                 randomX = -randomX;
             }
