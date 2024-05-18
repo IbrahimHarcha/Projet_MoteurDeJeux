@@ -385,6 +385,9 @@ int main(void)
         if (play){
             planInfini.transform.Translate(-(voiture.getSpeed() * camera->getFront()));
             cubeInfini.transform.Translate(-(voiture.getSpeed() * camera->getFront()));
+
+            // std::cout<<"Plan infini :"<<planInfini.transform.getPosition().z<<std::endl;
+            
         
             roadInfini(planInfini);
             cubeInf(cubeInfini);
@@ -631,8 +634,8 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 bool collisionCarRoad(Object &voiture, Terrain &terrain){
     glm::vec3 voiturePos = voiture.transform.getPosition();
 
-    bool collisionX = (voiturePos.x > -(sizeRoadX/2 -2)) &&
-                      (voiturePos.x < sizeRoadX/2 -2);
+    bool collisionX = (voiturePos.x > -(sizeRoadX/2 -1.75)) &&
+                      (voiturePos.x < sizeRoadX/2 -1.75);
 
     return collisionX;
 }
@@ -750,5 +753,3 @@ bool checkCollision(const std::vector<vec3>& aabb1, const std::vector<vec3>& aab
     // si les boîtes englobantes s'intersectent sur tous les axes, il y a une collision
     return collisionX && collisionY && collisionZ;
 }
-
-
